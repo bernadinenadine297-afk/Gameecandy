@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>🍬 Candy Catcher</title>
+
+    <style>
+
+        /* =========================
+           RESET
+        ========================= */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        /* =========================
+           BODY
+        ========================= */
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff9ff3,
+                    #feca57,
+                    #ff6b81
+                );
+
+            padding: 20px;
+        }
+
+
+        /* =========================
+           CONTAINER
+        ========================= */
+
+        .game-container {
+
+            width: 430px;
+
+            max-width: 100%;
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           JUDUL
+        ========================= */
+
+        h1 {
+
+            color: white;
+
+            font-size: 32px;
+
+            margin-bottom: 15px;
+
+            text-shadow:
+                2px 2px 4px rgba(0,0,0,0.4);
+        }
+
+
+        /* =========================
+           SCORE BOARD
+        ========================= */
+
+        .score-board {
+
+            background: white;
+
+            border-radius: 15px;
+
+            padding: 12px;
+
+            margin-bottom: 10px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            font-weight: bold;
+
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.2);
+        }
+
+
+        .score {
+            color: #6c5ce7;
+        }
+
+
+        .lives {
+            color: #ff4757;
+        }
+
+
+        .timer {
+            color: #0984e3;
+        }
+
+
+        /* =========================
+           AREA GAME
+        ========================= */
+
+        #game {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 600px;
+
+            overflow: hidden;
+
+            border-radius: 20px;
+
+            border: 5px solid white;
+
+            background:
+                linear-gradient(
+                    to bottom,
+                    #74b9ff 0%,
+                    #81ecec 55%,
+                    #55efc4 100%
+                );
+
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.3);
+        }
+
+
+        /* =========================
+           AWAN
+        ========================= */
+
+        .cloud {
+
+            position: absolute;
+
+            font-size: 45px;
+
+            opacity: 0.8;
+
+            pointer-events: none;
+        }
+
+
+        .cloud1 {
+            top: 30px;
+            left: 20px;
+        }
+
+
+        .cloud2 {
+            top: 90px;
+            right: 20px;
+        }
+
+
+        .cloud3 {
+            top: 170px;
+            left: 130px;
+        }
+
+
+        /* =========================
+           MATAHARI
+        ========================= */
+
+        .sun {
+
+            position: absolute;
+
+            top: 20px;
+
+            right: 100px;
+
+            font-size: 55px;
+
+            pointer-events: none;
+        }
+
+
+        /* =========================
+           TANAH
+        ========================= */
+
+        .ground {
+
+            position: absolute;
+
+            bottom: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100px;
+
+            background:
+                linear-gradient(
+                    #55efc4,
+                    #00b894
+                );
+
+            z-index: 1;
+        }
+
+
+        /* =========================
+           KERANJANG
+        ========================= */
+
+        #basket {
+
+            position: absolute;
+
+            bottom: 35px;
+
+            left: 50%;
+
+            transform:
+                translateX(-50%);
+
+            width: 85px;
+
+            height: 75px;
+
+            font-size: 65px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            z-index: 10;
+
+            user-select: none;
+
+            cursor: pointer;
+        }
+
+
+        /* =========================
+           PERMEN
+        ========================= */
+
+        .candy {
+
+            position: absolute;
+
+            font-size: 38px;
+
+            z-index: 5;
+
+            user-select: none;
+
+            pointer-events: none;
+        }
+
+
+        /* =========================
+           BOM
+        ========================= */
+
+        .bomb {
+
+            position: absolute;
+
+            font-size: 40px;
+
+            z-index: 5;
+
+            user-select: none;
+
+            pointer-events: none;
+        }
+
+
+        /* =========================
+           EFEK KOIN
+        ========================= */
+
+        .plus-score {
+
+            position: absolute;
+
+            color: #ffffff;
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+            z-index: 30;
+
+            animation:
+                scoreAnimation 0.8s ease-out forwards;
+
+            pointer-events: none;
+        }
+
+
+        @keyframes scoreAnimation {
+
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+
+
+        /* =========================
+           LAYAR MULAI & GAME OVER
+        ========================= */
+
+        #start-screen,
+        #game-over {
+
+            position: absolute;
+
+            inset: 0;
+
+            background:
+                rgba(0,0,0,0.7);
+
+            color: white;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            align-items: center;
+
+            text-align: center;
+
+            padding: 25px;
+
+            z-index: 100;
+        }
+
+
+        #game-over {
+
+            display: none;
+        }
+
+
+        #start-screen h2,
+        #game-over h2 {
+
+            font-size: 30px;
+
+            margin-bottom: 15px;
+        }
+
+
+        #start-screen p,
+        #game-over p {
+
+            margin: 6px 0;
+
+            line-height: 1.5;
+        }
+
+
+        /* =========================
+           TOMBOL
+        ========================= */
+
+        .main-button {
+
+            margin-top: 20px;
+
+            padding: 14px 30px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: #ff6b81;
+
+            color: white;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 5px 10px rgba(0,0,0,0.2);
+
+            transition: 0.2s;
+        }
+
+
+        .main-button:hover {
+
+            transform: scale(1.05);
+
+            background: #ff4757;
+        }
+
+
+        /* =========================
+           KONTROL
+        ========================= */
+
+        .controls {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 25px;
+
+            margin-top: 15px;
+        }
+
+
+        .control-button {
+
+            width: 120px;
+
+            height: 55px;
+
+            border: none;
+
+            border-radius: 15px;
+
+            background: white;
+
+            color: #6c5ce7;
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 5px 10px rgba(0,0,0,0.2);
+
+            transition: 0.15s;
+        }
+
+
+        .control-button:active {
+
+            transform: scale(0.9);
+        }
+
+
+        /* =========================
+           PETUNJUK
+        ========================= */
+
+        .instructions {
+
+            color: white;
+
+            margin-top: 12px;
+
+            font-size: 14px;
+
+            text-shadow:
+                1px 1px 2px rgba(0,0,0,0.4);
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 500px) {
+
+            body {
+                padding: 10px;
+            }
+
+
+            h1 {
+                font-size: 26px;
+            }
+
+
+            #game {
+                height: 550px;
+            }
+
+
+            .score-board {
+                font-size: 13px;
+            }
+
+
+            .control-button {
+                width: 100px;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<div class="game-container">
+
+
+    <!-- JUDUL -->
+
+    <h1>
+        🍬 Candy Catcher 🍭
+    </h1>
+
+
+    <!-- SCORE -->
+
+    <div class="score-board">
+
+        <div class="score">
+            🏆 Skor:
+            <span id="score">0</span>
+        </div>
+
+        <div class="lives">
+            ❤️ Nyawa:
+            <span id="lives">3</span>
+        </div>
+
+        <div class="timer">
+            ⏱️
+            <span id="time">60</span>
+        </div>
+
+    </div>
+
+
+    <!-- AREA GAME -->
+
+    <div id="game">
+
+
+        <!-- AWAN -->
+
+        <div class="cloud cloud1">
+            ☁️
+        </div>
+
+
+        <div class="cloud cloud2">
+            ☁️
+        </div>
+
+
+        <div class="cloud cloud3">
+            ☁️
+        </div>
+
+
+        <!-- MATAHARI -->
+
+        <div class="sun">
+            ☀️
+        </div>
+
+
+        <!-- TANAH -->
+
+        <div class="ground"></div>
+
+
+        <!-- KERANJANG -->
+
+        <div id="basket">
+            🧺
+        </div>
+
+
+        <!-- =====================
+             LAYAR MULAI
+        ====================== -->
+
+        <div id="start-screen">
+
+            <h2>
+                🍭 Candy Catcher
+            </h2>
+
+            <p>
+                Tangkap permen sebanyak mungkin!
+            </p>
+
+            <p>
+                🍬 🍭 🍫 🍩 🧁
+                = <b>+10 poin</b>
+            </p>
+
+            <p>
+                💣 = <b>-1 nyawa</b>
+            </p>
+
+            <p>
+                Kamu memiliki waktu
+                <b>60 detik</b>.
+            </p>
+
+            <button
+                class="main-button"
+                onclick="startGame()">
+
+                ▶️ MULAI GAME
+
+            </button>
+
+        </div>
+
+
+        <!-- =====================
+             GAME OVER
+        ====================== -->
+
+        <div id="game-over">
+
+            <h2>
+                🎮 GAME OVER
+            </h2>
+
+            <p>
+                Permainan selesai!
+            </p>
+
+            <p>
+                Skor akhir kamu:
+            </p>
+
+            <h1 id="final-score">
+                0
+            </h1>
+
+            <p id="result-message">
+                Hebat!
+            </p>
+
+            <button
+                class="main-button"
+                onclick="restartGame()">
+
+                🔄 MAIN LAGI
+
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================
+         TOMBOL HP
+    ====================== -->
+
+    <div class="controls">
+
+        <button
+            class="control-button"
+            onclick="moveLeft()">
+
+            ⬅️
+
+        </button>
+
+
+        <button
+            class="control-button"
+            onclick="moveRight()">
+
+            ➡️
+
+        </button>
+
+    </div>
+
+
+    <div class="instructions">
+
+        💻 Keyboard:
+        tekan ← dan →
+
+        <br>
+
+        📱 HP:
+        gunakan tombol di atas
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+    /* ==================================================
+       MENGAMBIL ELEMENT HTML
+    ================================================== */
+
+    const game =
+        document.getElementById("game");
+
+
+    const basket =
+        document.getElementById("basket");
+
+
+    const scoreText =
+        document.getElementById("score");
+
+
+    const livesText =
+        document.getElementById("lives");
+
+
+    const timeText =
+        document.getElementById("time");
+
+
+    const startScreen =
+        document.getElementById("start-screen");
+
+
+    const gameOverScreen =
+        document.getElementById("game-over");
+
+
+    const finalScore =
+        document.getElementById("final-score");
+
+
+    const resultMessage =
+        document.getElementById("result-message");
+
+
+    /* ==================================================
+       VARIABEL GAME
+    ================================================== */
+
+    let basketX = 50;
+
+    let score = 0;
+
+    let lives = 3;
+
+    let time = 60;
+
+    let gameRunning = false;
+
+
+    let timerInterval = null;
+
+    let spawnInterval = null;
+
+
+    /* ==================================================
+       UPDATE POSISI KERANJANG
+    ================================================== */
+
+    function updateBasket() {
+
+        basket.style.left =
+            basketX + "%";
+
+    }
+
+
+    /* ==================================================
+       GERAK KE KIRI
+    ================================================== */
+
+    function moveLeft() {
+
+        if (!gameRunning) {
+            return;
+        }
+
+
+        basketX -= 7;
+
+
+        if (basketX < 8) {
+
+            basketX = 8;
+
+        }
+
+
+        updateBasket();
+
+    }
+
+
+    /* ==================================================
+       GERAK KE KANAN
+    ================================================== */
+
+    function moveRight() {
+
+        if (!gameRunning) {
+            return;
+        }
+
+
+        basketX += 7;
+
+
+        if (basketX > 92) {
+
+            basketX = 92;
+
+        }
+
+
+        updateBasket();
+
+    }
+
+
+    /* ==================================================
+       KONTROL KEYBOARD
+    ================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function(event) {
+
+
+            if (
+                event.key === "ArrowLeft"
+            ) {
+
+                event.preventDefault();
+
+                moveLeft();
+
+            }
+
+
+            if (
+                event.key === "ArrowRight"
+            ) {
+
+                event.preventDefault();
+
+                moveRight();
+
+            }
+
+        }
+    );
+
+
+    /* ==================================================
+       KONTROL MOUSE
+    ================================================== */
+
+    game.addEventListener(
+        "mousemove",
+        function(event) {
+
+            if (!gameRunning) {
+                return;
+            }
+
+
+            const rect =
+                game.getBoundingClientRect();
+
+
+            const mouseX =
+                event.clientX -
+                rect.left;
+
+
+            const percent =
+                (mouseX / rect.width) * 100;
+
+
+            basketX =
+                Math.max(
+                    8,
+                    Math.min(92, percent)
+                );
+
+
+            updateBasket();
+
+        }
+    );
+
+
+    /* ==================================================
+       KONTROL SENTUHAN HP
+    ================================================== */
+
+    game.addEventListener(
+        "touchmove",
+        function(event) {
+
+            if (!gameRunning) {
+                return;
+            }
+
+
+            const touch =
+                event.touches[0];
+
+
+            const rect =
+                game.getBoundingClientRect();
+
+
+            const touchX =
+                touch.clientX -
+                rect.left;
+
+
+            const percent =
+                (touchX / rect.width) * 100;
+
+
+            basketX =
+                Math.max(
+                    8,
+                    Math.min(92, percent)
+                );
+
+
+            updateBasket();
+
+        },
+        {
+            passive: true
+        }
+    );
+
+
+    /* ==================================================
+       MULAI GAME
+    ================================================== */
+
+    function startGame() {
+
+
+        gameRunning = true;
+
+
+        score = 0;
+
+        lives = 3;
+
+        time = 60;
+
+        basketX = 50;
+
+
+        scoreText.textContent =
+            score;
+
+
+        livesText.textContent =
+            lives;
+
+
+        timeText.textContent =
+            time;
+
+
+        startScreen.style.display =
+            "none";
+
+
+        gameOverScreen.style.display =
+            "none";
+
+
+        updateBasket();
+
+
+        clearObjects();
+
+
+        clearInterval(timerInterval);
+
+        clearInterval(spawnInterval);
+
+
+        /* TIMER */
+
+        timerInterval =
+            setInterval(
+                updateTimer,
+                1000
+            );
+
+
+        /* OBJEK JATUH */
+
+        spawnInterval =
+            setInterval(
+                createObject,
+                650
+            );
+
+    }
+
+
+    /* ==================================================
+       TIMER
+    ================================================== */
+
+    function updateTimer() {
+
+
+        if (!gameRunning) {
+            return;
+        }
+
+
+        time--;
+
+
+        timeText.textContent =
+            time;
+
+
+        if (time <= 0) {
+
+            endGame();
+
+        }
+
+    }
+
+
+    /* ==================================================
+       MEMBUAT PERMEN / BOM
+    ================================================== */
+
+    function createObject() {
+
+
+        if (!gameRunning) {
+            return;
+        }
+
+
+        const object =
+            document.createElement("div");
+
+
+        /* 75% PERMEN */
+
+        const isCandy =
+            Math.random() < 0.75;
+
+
+        if (isCandy) {
+
+
+            object.className =
+                "candy";
+
+
+            const candyList = [
+
+                "🍬",
+
+                "🍭",
+
+                "🍫",
+
+                "🍩",
+
+                "🧁",
+
+                "🍪",
+
+                "🍰"
+
+            ];
+
+
+            const randomCandy =
+                Math.floor(
+                    Math.random() *
+                    candyList.length
+                );
+
+
+            object.textContent =
+                candyList[randomCandy];
+
+
+        }
+
+        else {
+
+
+            object.className =
+                "bomb";
+
+
+            object.textContent =
+                "💣";
+
+        }
+
+
+        /* POSISI ACAK */
+
+        const randomX =
+            8 +
+            Math.random() * 84;
+
+
+        object.style.left =
+            randomX + "%";
+
+
+        object.style.top =
+            "-50px";
+
+
+        game.appendChild(object);
+
+
+        /* KECEPATAN JATUH */
+
+        let y = -50;
+
+
+        const speed =
+            3 +
+            Math.random() * 3;
+
+
+        const fall =
+            setInterval(
+                function() {
+
+
+                    if (!gameRunning) {
+
+
+                        clearInterval(fall);
+
+
+                        if (
+                            object.parentElement
+                        ) {
+
+                            object.remove();
+
+                        }
+
+
+                        return;
+
+                    }
+
+
+                    y += speed;
+
+
+                    object.style.top =
+                        y + "px";
+
+
+                    /* CEK TABRAKAN */
+
+                    checkCollision(
+                        object,
+                        isCandy,
+                        fall
+                    );
+
+
+                    /* HAPUS JIKA KELUAR */
+
+                    if (y > 650) {
+
+
+                        clearInterval(fall);
+
+
+                        if (
+                            object.parentElement
+                        ) {
+
+                            object.remove();
+
+                        }
+
+                    }
+
+
+                },
+                30
+            );
+
+    }
+
+
+    /* ==================================================
+       CEK TABRAKAN
+    ================================================== */
+
+    function checkCollision(
+        object,
+        isCandy,
+        fall
+    ) {
+
+
+        const objectRect =
+            object.getBoundingClientRect();
+
+
+        const basketRect =
+            basket.getBoundingClientRect();
+
+
+        const collision =
+
+            objectRect.bottom >=
+            basketRect.top &&
+
+            objectRect.top <=
+            basketRect.bottom &&
+
+            objectRect.right >=
+            basketRect.left &&
+
+            objectRect.left <=
+            basketRect.right;
+
+
+        if (!collision) {
+            return;
+        }
+
+
+        clearInterval(fall);
+
+
+        const x =
+            object.offsetLeft;
+
+
+        const y =
+            object.offsetTop;
+
+
+        object.remove();
+
+
+        /* PERMEN */
+
+        if (isCandy) {
+
+
+            score += 10;
+
+
+            scoreText.textContent =
+                score;
+
+
+            showPlusScore(
+                x,
+                y
+            );
+
+
+        }
+
+        /* BOM */
+
+        else {
+
+
+            lives--;
+
+
+            livesText.textContent =
+                lives;
+
+
+            if (lives <= 0) {
+
+                endGame();
+
+            }
+
+        }
+
+    }
+
+
+    /* ==================================================
+       EFEK +10
+    ================================================== */
+
+    function showPlusScore(
+        x,
+        y
+    ) {
+
+
+        const text =
+            document.createElement("div");
+
+
+        text.className =
+            "plus-score";
+
+
+        text.textContent =
+            "+10";
+
+
+        text.style.left =
+            x + "px";
+
+
+        text.style.top =
+            y + "px";
+
+
+        game.appendChild(text);
+
+
+        setTimeout(
+            function() {
+
+                text.remove();
+
+            },
+            800
+        );
+
+    }
+
+
+    /* ==================================================
+       GAME OVER
+    ================================================== */
+
+    function endGame() {
+
+
+        if (!gameRunning) {
+            return;
+        }
+
+
+        gameRunning = false;
+
+
+        clearInterval(timerInterval);
+
+        clearInterval(spawnInterval);
+
+
+        finalScore.textContent =
+            score;
+
+
+        if (score >= 300) {
+
+            resultMessage.textContent =
+                "🏆 Luar biasa! Kamu jago menangkap permen!";
+
+        }
+
+        else if (score >= 150) {
+
+            resultMessage.textContent =
+                "🎉 Bagus! Coba lagi untuk mendapatkan skor lebih tinggi!";
+
+        }
+
+        else {
+
+            resultMessage.textContent =
+                "😊 Jangan menyerah! Coba main lagi!";
+
+        }
+
+
+        gameOverScreen.style.display =
+            "flex";
+
+    }
+
+
+    /* ==================================================
+       RESTART GAME
+    ================================================== */
+
+    function restartGame() {
+
+
+        clearObjects();
+
+
+        startGame();
+
+    }
+
+
+    /* ==================================================
+       HAPUS SEMUA OBJEK
+    ================================================== */
+
+    function clearObjects() {
+
+
+        const objects =
+            document.querySelectorAll(
+                ".candy, .bomb, .plus-score"
+            );
+
+
+        objects.forEach(
+            function(object) {
+
+                object.remove();
+
+            }
+        );
+
+    }
+
+
+    /* ==================================================
+       POSISI AWAL
+    ================================================== */
+
+    updateBasket();
+
+
+</script>
+
+
+</body>
+</html>
